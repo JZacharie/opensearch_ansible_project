@@ -1,0 +1,92 @@
+- name: Install OpenSearch cluster on Ubuntu 20.04
+  hosts: opensearch_cluster
+  become: yes
+  vars:
+    cluster_name: opensearch-cluster
+    node_names:
+      - node1
+      - node2
+      - node3
+    discovery_seeds: "{{ groups['opensearch_cluster'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(',') }}"
+    heap_size: "{{ ansible_memtotal_mb // 2 }}m"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - wget
+        state: present
+
+    - name: Install Java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name: Set JAVA_HOME
+      lineinfile:
+        path: /etc/environment
+        line: 'JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"'
+        state: present
+
+    - name: Add OpenSearch GPG key
+      apt_key:
+        url: https://artifacts.opensearch.org/publickeys/opensearch.pgp
+        state: present
+
+    - name: Add OpenSearch repository
+      apt_repository:
+        repo: deb https://artifacts.opensearch.org/releases/bundle/opensearch/2.x/apt stable main
+        state: present
+        filename: opensearch
+
+    - name: Install OpenSearch
+      apt:
+        name: opensearch
+        state: present
+
+    - name: Configure OpenSearch
+      template:
+        src: opensearch.yml.j2
+        dest: /etc/opensearch/opensearch.yml
+      notify: Restart OpenSearch
+
+    - name: Configure JVM options
+      template:
+        src: jvm.options.j2
+        dest: /etc/opensearch/jvm.options
+      notify: Restart OpenSearch
+
+    - name: Start OpenSearch service
+      systemd:
+        name: opensearch
+        state: started
+        enabled: yes
+
+    - name: Wait for OpenSearch to start
+      wait_for:
+        port: 9200
+        delay: 10
+
+  handlers:
+    - name: Restart OpenSearch
+      systemd:
+        name: opensearch
+        state: restarted
+
+- name: Verify cluster health
+  hosts: opensearch_cluster[0]
+  tasks:
+    - name: Check cluster health
+      uri:
+        url: http://localhost:9200/_cluster/health
+        method: GET
+      register: cluster_health
+      until: cluster_health.json.status == "green"
+      retries: 60
+      delay: 5

@@ -1,0 +1,19 @@
+cluster.name: {{ cluster_name }}
+node.name: {{ node_names[ansible_play_hosts.index(inventory_hostname)] }}
+network.host: 0.0.0.0
+discovery.seed_hosts: [ "{{ discovery_seeds }}" ]
+cluster.initial_master_nodes: [ "{{ node_names | join('", "') }}" ]
+
+http.port: 9200
+transport.port: 9300
+
+# Disable security
+plugins.security.disabled: true
+
+# Disable SSL
+plugins.security.ssl.http.enabled: false
+plugins.security.ssl.transport.enabled: false
+
+# Allow CORS for easier development
+http.cors.enabled: true
+http.cors.allow-origin: "*"
