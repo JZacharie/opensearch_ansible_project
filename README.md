@@ -2,7 +2,8 @@
 
 ## Description
 
-Ce projet contient les fichiers Ansible nécessaires pour déployer un cluster OpenSearch de 3 nœuds sur des machines Ubuntu 20.04. Le cluster est configuré sans sécurité ni SSL pour simplifier le déploiement initial, mais cette configuration n'est pas recommandée pour un environnement de production.
+Ce projet contient les fichiers Ansible nécessaires pour déployer un cluster OpenSearch de 3 nœuds sur des machines Ubuntu 20.04. 
+Le cluster est configuré sans sécurité ni SSL pour simplifier le déploiement initial.
 
 ## Structure du projet
     opensearch_ansible_project/
