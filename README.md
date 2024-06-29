@@ -5,12 +5,12 @@
 Ce projet contient les fichiers Ansible nécessaires pour déployer un cluster OpenSearch de 3 nœuds sur des machines Ubuntu 20.04. Le cluster est configuré sans sécurité ni SSL pour simplifier le déploiement initial, mais cette configuration n'est pas recommandée pour un environnement de production.
 
 ## Structure du projet
-opensearch_ansible_project/
-├── playbook.yml
-├── inventory.ini
-├── opensearch.yml.j2
-└── jvm.options.j2
-Copy
+  opensearch_ansible_project/
+  ├── playbook.yml
+  ├── inventory.ini
+  ├── opensearch.yml.j2
+  └── jvm.options.j2
+
 - `playbook.yml`: Le playbook Ansible principal qui orchestre l'installation et la configuration d'OpenSearch.
 - `inventory.ini`: Le fichier d'inventaire qui liste les hôtes cibles pour le déploiement.
 - `opensearch.yml.j2`: Un template Jinja2 pour la configuration d'OpenSearch.
